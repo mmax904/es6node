@@ -5,22 +5,14 @@ import path from 'path';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import logger from 'morgan';
-//import layout from 'express-layout';
+import layout from 'express-layout';
 import validator from 'express-validator';
-import { check, validationResult } from 'express-validator/check';
-import { matchedData } from 'express-validator/filter';
 import session from 'express-session';
 import flash from 'express-flash';
 import helmet from 'helmet';
 import csrf from 'csurf';
-import multer from 'multer';
 
-/**for storing in memory as buffer
- *const upload = multer({ storage: multer.memoryStorage() })
- */
-const upload = multer({ dest: 'uploads/' })
 
-import Reflection from './src/controllers/Reflection';
 
 const port = 3000;
 const app = express();
@@ -88,9 +80,6 @@ app.use(bodyParser.json({limit: '50mb'}));
  */
 app.use(bodyParser.json({ type: 'application/vnd.api+json' }));
 
-/*import indexRouter from './routes/index';
-import usersRouter from './routes/users';*/
-
 app.use(function (req, res, next) {
     res.header('Access-Control-Allow-Origin', req.get('Origin') || '*');
     res.header('Access-Control-Allow-Credentials', 'true');
@@ -102,63 +91,18 @@ app.use(function (req, res, next) {
     } else {
         return next();
     }
-})
-
-app.get('/', function(req, res, next) {
-  	res.render('layouts/index', { title: 'Express' });
 });
 
-app.get('/contact', (req, res) => {
-	res.render('layouts/index', {
-		section:'../contact',
-		data: {},
-	    errors: {},
-	    csrfToken: req.csrfToken()
-	})
-})
+import indexRouter from './routes/index';
+import contactRouter from './routes/contact';
+import reflectionRouter from './routes/reflection';
 
-app.post('/contact', upload.single('photo'), [
-	check('message')
-		.isLength({ min: 1 })
-		.withMessage('Message is required')
-		.trim(),
-	check('email')
-		.isEmail()
-		.withMessage('That email doesn‘t look right')
-		.trim()
-		.normalizeEmail()
-	], (req, res) => {
-	console.log(req.body);
-	const errors = validationResult(req)
-	
-	if (!errors.isEmpty()) {
-		return res.render('layouts/index', {
-			section:'../contact',
-			data: req.body,
-			errors: errors.mapped(),
-			csrfToken: req.csrfToken()
-		})
-	}
-
-	const data = matchedData(req)
-	console.log('Sanitized: ', data)
-	if (req.file) {
-		console.log('Uploaded: ', req.file)
-		// Homework: Upload file to S3
-	}
-	req.flash('success', 'Thanks for the message! I‘ll be in touch :)')
-	res.redirect('/')
-})
-
+app.use('/', indexRouter);
+app.use('/contact', contactRouter);
+app.use('/api/v1/reflections', reflectionRouter);
 app.get('/api/v1/test', (req, res) => {
   	return res.status(200).send({'message': 'YAY! Congratulations! Your first endpoint is working'});
 });
-
-app.post('/api/v1/reflections', Reflection.create);
-app.get('/api/v1/reflections', Reflection.getAll);
-app.get('/api/v1/reflections/:id', Reflection.getOne);
-app.put('/api/v1/reflections/:id', Reflection.update);
-app.delete('/api/v1/reflections/:id', Reflection.delete);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
