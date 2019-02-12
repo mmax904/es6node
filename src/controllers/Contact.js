@@ -9,7 +9,7 @@ const Contact = {
      * @param {object} res 
      * @returns {object} contacts array
      */
-    view: function (req, res) {
+    view: async function (req, res) {
         ContactModel.findAll(function(contacts) {
             return res.render('layouts/index', {
                 section:'../contacts/list',

@@ -17,6 +17,7 @@ import session from 'express-session';
 import flash from 'express-flash';
 import helmet from 'helmet';
 import csrf from 'csurf';
+import "babel-polyfill";
 
 // environment variables
 process.env.NODE_ENV = 'development';
