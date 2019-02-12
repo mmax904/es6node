@@ -1,3 +1,9 @@
+process.env.NODE_ENV = 'dev';
+var NodeEnviRonment = '.env.'+process.env.NODE_ENV;
+
+import dotenv from 'dotenv';
+dotenv.config({path: NodeEnviRonment});
+
 import createError from 'http-errors';
 import express from 'express';
 import exphbs from 'express-handlebars';
@@ -12,10 +18,20 @@ import flash from 'express-flash';
 import helmet from 'helmet';
 import csrf from 'csurf';
 
+// environment variables
+process.env.NODE_ENV = 'development';
 
+// uncomment below line to test this code against staging environment
+// process.env.NODE_ENV = 'staging';
 
-const port = 3000;
+// config variables
+import config from './config/config.js';
+import mysqlcon from './config/MySQL';
+
 const app = express();
+
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
+process.env.TZ = process.env.SERVER_TIMEZONE;
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -49,6 +65,7 @@ app.use(cookieParser());
 app.use(middlewares);
 
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'uploads')));
 
 app.use(function (req, res, next) {
 	res.cookie('XSRF-TOKEN', req.csrfToken());
@@ -120,7 +137,7 @@ app.use(function(err, req, res, next) {
 	res.render('error');
 });
 
-
-app.listen(port, () => {
-  console.log(`Listening on http://localhost:${port}`);
+//app.listen(global.gConfig.node_port, () => {
+app.listen(process.env.NODE_PORT, () => {
+    console.log(`${global.gConfig.app_name} Listening on http://localhost:${global.gConfig.node_port}`);
 });

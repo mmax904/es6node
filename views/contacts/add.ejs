@@ -1,4 +1,4 @@
-<!-- views/contact.ejs -->
+<!-- views/contacts/add.ejs -->
 <div class="form-header">
     <% if (Object.keys(errors).length === 0) { %>
         <h2>Send us a message</h2>
@@ -12,7 +12,7 @@
     <% } %>
 </div>
 
-<form method="post" action="/contact?_csrf=<%= csrfToken %>" novalidate enctype="multipart/form-data">
+<form class="contact-form" method="post" action="/contact/add?_csrf=<%= csrfToken %>" novalidate enctype="multipart/form-data">
     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
     <div class="form-field <%= errors.message ? 'form-field-invalid' : '' %>">
         <label for="message">Message</label>
@@ -33,6 +33,6 @@
         <input class="input" id="photo" name="photo" type="file" />
     </div>
     <div class="form-actions">
-        <button class="btn" type="submit">Send</button>
+        <button class="btn btn-success" type="submit">Send</button>
     </div>
 </form>

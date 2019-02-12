@@ -1,0 +1,36 @@
+<!-- views/contacts/list.ejs -->
+<div class="table-wrapper">
+    <% if (data.length > 0) {%>
+        <table class="table table-hovered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Image</th>
+                    <th>Email</th>
+                    <th>Message</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% data.forEach((contact, index) => { index++ %>
+                    <tr>
+                        <th><%= index %></th>
+                        <td><img src="/<%= contact.photo %>" class="rounded-circle player-img" alt="" width="100" height="100"></td>
+                        <td><%= contact.email %></td>
+                        <td><%= contact.message %></td>
+                        <td>
+                            <a href="/contact/edit/<%= contact.id %>" target="_blank" rel="noopener" class="btn btn-sm btn-info">Edit</a>
+                            <form method="post" action="/contact/<%= contact.id %>?_csrf=<%= csrfToken %>" style="display:inline">
+                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+        <p class="text-center">Add Contacts from <a href="/contact/add" >here</a>.</p>
+    <% } else { %>
+        <p class="text-center">No Contacts found. Go <a href="/contact/add" >here</a> to add contacts.</p>
+    <% } %>
+</div>

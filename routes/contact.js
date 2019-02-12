@@ -13,22 +13,25 @@ import { matchedData } from 'express-validator/filter';
  */
 //const upload = multer({ dest: 'uploads/' });
 
+multer({ dest: 'uploads/contacts' });
+
 var storage = multer.diskStorage({
 	destination: function (req, file, cb) {
 		cb(null, 'uploads/contacts')
 	},
 	filename: function (req, file, cb) {
-		console.log('file:'+JSON.stringify(file));
+		//console.log('file:'+JSON.stringify(file));
 		cb(null, file.fieldname + '-' + Date.now() + '-' + file.originalname );
 	}
 });
  
 var upload = multer({ storage: storage });
 
-/* GET contacts page. */
+/* GET contacts list. */
 router.get('/', Contact.view);
 
-router.post('/', upload.single('photo'), [
+router.get('/add', Contact.create);
+router.post('/add', upload.single('photo'), [
 	check('message')
 		.isLength({ min: 1 })
 		.withMessage('Message is required')
@@ -39,7 +42,23 @@ router.post('/', upload.single('photo'), [
 		.trim()
 		.normalizeEmail()
 	], 
-Contact.create);
+Contact.store);
+
+router.get('/edit/:id', Contact.edit);
+router.post('/edit/:id', upload.single('photo'), [
+	check('message')
+		.isLength({ min: 1 })
+		.withMessage('Message is required')
+		.trim(),
+	check('email')
+		.isEmail()
+		.withMessage('That email doesn‘t look right')
+		.trim()
+		.normalizeEmail()
+	], 
+Contact.update);
+
+router.post('/:id', Contact.delete);
 
 var uploadProfileImgs = multer({dest : 'uploads/profile/'}).single('avatar');
 

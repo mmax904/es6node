@@ -72,6 +72,27 @@ label {
 .form-actions {
   margin-top: 20px;
 }
+.btn {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  background: #24b47e;
+  border: 1px solid rgba(0,0,0,.1);
+  border-width: 1px 1px 3px;
+  border-radius: 3px;
+  font: inherit;
+  color: #fff;
+  cursor: pointer;
+  text-shadow: 0 1px 0 rgba(0,0,0,.3), 0 1px 1px rgba(0,0,0,.2);
+}
+.btn:hover,
+.btn:focus {
+  outline: none;
+  background: #2AA172;
+}
+.btn:active {
+  transform: translateY(1px);
+}
 .flash {
   padding: 15px 20px;
   border: 1px solid;

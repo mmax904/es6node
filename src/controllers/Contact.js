@@ -6,12 +6,27 @@ const Contact = {
     /**
      * 
      * @param {object} req 
+     * @param {object} res 
+     * @returns {object} contacts array
+     */
+    view: function (req, res) {
+        ContactModel.findAll(function(contacts) {
+            return res.render('layouts/index', {
+                section:'../contacts/list',
+                data: contacts,
+                csrfToken: req.csrfToken()
+            });
+        });
+    },
+    /**
+     * 
+     * @param {object} req 
      * @param {object} res
      * @returns {object} contact object 
      */
-    view(req, res) {
+    create(req, res) {
         res.render('layouts/index', {
-            section:'../contact',
+            section:'../contacts/add',
             data: {},
             errors: {},
             csrfToken: req.csrfToken()
@@ -23,13 +38,11 @@ const Contact = {
      * @param {object} res
      * @returns {object} contact object 
      */
-    create(req, res) {
-        console.log(req.body);
+    store(req, res) {
         const errors = validationResult(req)
-        
         if (!errors.isEmpty()) {
             return res.render('layouts/index', {
-                section:'../contact',
+                section:'../contacts/add',
                 data: req.body,
                 errors: errors.mapped(),
                 csrfToken: req.csrfToken()
@@ -37,23 +50,13 @@ const Contact = {
         }
 
         const data = matchedData(req)
-        console.log('Sanitized: ', data)
+        data.files = {};
         if (req.file) {
-            console.log('Uploaded: ', req.file)
-            // Homework: Upload file to S3
+            data.files = req.file;
         }
+        var newContact = ContactModel.store(data);
         req.flash('success', 'Thanks for the message! I‘ll be in touch :)')
-        res.redirect('/');
-    },
-    /**
-     * 
-     * @param {object} req 
-     * @param {object} res 
-     * @returns {object} contacts array
-     */
-    getAll(req, res) {
-        const contacts = ContactModel.findAll();
-        return res.status(200).send(contacts);
+        res.redirect('/contact');
     },
     /**
      * 
@@ -61,12 +64,18 @@ const Contact = {
      * @param {object} res
      * @returns {object} contact object
      */
-    getOne(req, res) {
-        const contact = ContactModel.findOne(req.params.id);
-        if (!contact) {
-            return res.status(404).send({'message': 'contact not found'});
-        }
-        return res.status(200).send(contact);
+    edit(req, res) {
+        ContactModel.findOne(req.params.id,function(contact) {
+            if (!contact.id) {
+                return res.status(404).send({'message': 'contact not found'});
+            }
+            return res.render('layouts/index', {
+                section:'../contacts/edit',
+                data: contact,
+                errors: [],
+                csrfToken: req.csrfToken()
+            })
+        });
     },
     /**
      * 
@@ -75,12 +84,28 @@ const Contact = {
      * @returns {object} updated contact
      */
     update(req, res) {
-        const contact = ContactModel.findOne(req.params.id);
-        if (!contact) {
-            return res.status(404).send({'message': 'contact not found'});
+        const errors = validationResult(req)
+        
+        if (!errors.isEmpty()) {
+            return res.render('layouts/index', {
+                section:'../contacts/edit',
+                data: req.body,
+                errors: errors.mapped(),
+                csrfToken: req.csrfToken()
+            })
         }
-        const updatedContact = ContactModel.update(req.params.id, req.body)
-        return res.status(200).send(updatedContact);
+
+        const data = matchedData(req)
+        data.files = {};
+        if (req.file) {
+            //console.log('Uploaded: ', req.file)
+            // here can Upload file to S3
+            data.files = req.file;
+        }
+        //console.log('Sanitized: ', data)
+        var updatedContact = ContactModel.update(req.params.id,data,true);
+        req.flash('success', 'Thanks for the message! I‘ll be in touch :)')
+        res.redirect('/contact');
     },
     /**
      * 
@@ -89,12 +114,13 @@ const Contact = {
      * @returns {void} return statuc code 204 
      */
     delete(req, res) {
-        const contact = ContactModel.findOne(req.params.id);
-        if (!contact) {
-            return res.status(404).send({'message': 'contact not found'});
-        }
-        const ref = ContactModel.delete(req.params.id);
-        return res.status(204).send(ref);
+        //res.redirect(req.get('referer'));
+        ContactModel.delete(req.params.id,function(contact) {
+            if (!contact) {
+                return res.status(404).send({'message': 'contact not found'});
+            }
+            res.redirect('/contact');
+        });
     }
 }
 
