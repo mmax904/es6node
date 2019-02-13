@@ -21,7 +21,7 @@ class Contact {
             id: uuid.v4(),
             email: data.email || '',
             message: data.message || '',
-            photo: data.files.length ? this.table+'/'+data.files.filename : '',
+            photo: data.files.filename ? this.table+'/'+data.files.filename : '',
             created_at: moment().format('YYYY-MM-DD HH:mm:ss'),
             updated_at: moment().format('YYYY-MM-DD HH:mm:ss')
         };
@@ -57,7 +57,7 @@ class Contact {
         const updatedContact = {
             email: data.email || '',
             message: data.message || '',
-            photo: data.files.length ? this.table+'/'+data.files.filename : '',
+            photo: data.files.filename ? this.table+'/'+data.files.filename : '',
             updated_at: moment().format('YYYY-MM-DD HH:mm:ss')
         };
 
